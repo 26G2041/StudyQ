@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="description" content="友人やクラスメートと問題集を共有して学習できる1問1答アプリ">
+  <title>StudyQ | 1問1答</title>
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="brand">StudyQ</div>
+    <div id="userLabel" class="muted">ログインしていません</div>
+  </div>
+</header>
+
+<main>
+  <section id="authView" class="card">
+    <h1>StudyQへようこそ</h1>
+    <p class="muted">友人やクラスメートと問題集を共有して学習できます。</p>
+    <label>メールアドレス
+      <input id="email" type="email" autocomplete="email" placeholder="name@example.com">
+    </label>
+    <label>パスワード
+      <input id="password" type="password" autocomplete="current-password" placeholder="6文字以上">
+    </label>
+    <div class="row">
+      <button id="loginBtn">ログイン</button>
+      <button id="signupBtn" class="secondary">新規登録</button>
+    </div>
+    <p id="authMessage" class="muted" role="status"></p>
+  </section>
+
+  <section id="appView" class="hidden">
+    <nav class="nav" aria-label="メインメニュー">
+      <button class="active" data-tab="home">ホーム</button>
+      <button data-tab="quiz">問題演習</button>
+      <button data-tab="library">問題一覧</button>
+      <button data-tab="review">間違えた問題</button>
+      <button data-tab="history">学習記録</button>
+      <button id="adminAddNav" data-tab="adminAdd" class="hidden">問題を追加</button>
+      <button id="adminManageNav" data-tab="adminManage" class="hidden">問題を管理</button>
+    </nav>
+
+    <section id="home" class="tab card">
+      <h1>今日の学習</h1>
+      <p class="muted">少しずつ、確実に理解を増やしていきましょう。</p>
+      <div class="statgrid">
+        <div class="stat"><span class="muted">回答数</span><strong id="homeAttempts">0</strong></div>
+        <div class="stat"><span class="muted">正解数</span><strong id="homeCorrect">0</strong></div>
+        <div class="stat"><span class="muted">正答率</span><strong id="homeRate">0%</strong></div>
+      </div>
+      <div class="row top-gap">
+        <button data-go="quiz">問題演習へ</button>
+        <button class="secondary" data-go="review">間違えた問題を復習</button>
+      </div>
+    </section>
+
+    <section id="quiz" class="tab card hidden">
+      <h2>問題演習</h2>
+      <label for="quizCategorySelect">出題カテゴリ</label>
+      <select id="quizCategorySelect">
+        <option value="all">すべてのカテゴリ</option>
+      </select>
+      <p class="muted small">カテゴリを選んでから出題を開始してください。</p>
+      <div class="quiz-meta">
+        <span class="pill" id="qCategory">カテゴリ</span>
+        <span class="muted" id="qCounter"></span>
+      </div>
+      <div class="question" id="qText">「ランダム出題を開始」を押してください。</div>
+      <label for="answerInput">解答
+        <input id="answerInput" placeholder="答えを入力" autocomplete="off">
+      </label>
+      <div class="row">
+        <button id="checkBtn">解答する</button>
+        <button id="nextBtn" class="secondary" disabled>次の問題</button>
+      </div>
+      <div id="feedback" class="feedback hidden" role="status"></div>
+      <button id="startQuizBtn" class="ghost top-gap">ランダム出題を開始</button>
+    </section>
+
+    <section id="library" class="tab card hidden">
+      <h2>問題一覧・インプット</h2>
+      <p class="muted">カテゴリを選択すると、そのカテゴリに登録されている問題・解答・解説をまとめて確認できます。</p>
+      <label for="libraryCategorySelect">学習するカテゴリ</label>
+      <select id="libraryCategorySelect">
+        <option value="">カテゴリを選択してください</option>
+      </select>
+      <p id="libraryCount" class="muted small" aria-live="polite">カテゴリを選択してください。</p>
+      <div id="learningLibraryList" class="learning-library-list"></div>
+    </section>
+
+    <section id="review" class="tab card hidden">
+      <h2>間違えた問題の復習</h2>
+      <p class="muted">過去に間違えた問題から、まだ正解していないものを出題します。</p>
+      <p id="reviewCount"></p>
+      <button id="startReviewBtn">復習を始める</button>
+    </section>
+
+    <section id="history" class="tab card hidden">
+      <h2>学習記録</h2>
+      <div class="statgrid">
+        <div class="stat"><span class="muted">回答数</span><strong id="histAttempts">0</strong></div>
+        <div class="stat"><span class="muted">正解数</span><strong id="histCorrect">0</strong></div>
+        <div class="stat"><span class="muted">正答率</span><strong id="histRate">0%</strong></div>
+      </div>
+      <div id="historyList" class="history-list"></div>
+    </section>
+
+    <section id="adminAdd" class="tab card hidden">
+      <h2>問題を追加</h2>
+      <p class="muted">新しい問題を登録します。登録済み問題の確認・削除は「問題を管理」から行えます。</p>
+      <label for="newCategory">カテゴリ
+        <input id="newCategory" placeholder="例：英単語">
+      </label>
+      <label for="newQuestion">問題
+        <textarea id="newQuestion" placeholder="問題文"></textarea>
+      </label>
+      <label for="newAnswer">正解
+        <input id="newAnswer" placeholder="正解（文字列）">
+      </label>
+      <label for="newExplanation">解説
+        <textarea id="newExplanation" placeholder="任意の解説"></textarea>
+      </label>
+      <button id="addQuestionBtn">問題を登録</button>
+      <p id="adminMessage" class="muted" role="status"></p>
+    </section>
+
+    <section id="adminManage" class="tab card hidden">
+      <h2>登録済み問題の管理</h2>
+      <p class="muted">カテゴリで絞り込み、問題・解答・解説を確認できます。不要な問題は個別またはカテゴリ単位で削除できます。</p>
+      <label for="adminCategorySelect">表示するカテゴリ</label>
+      <select id="adminCategorySelect">
+        <option value="all">すべてのカテゴリ</option>
+      </select>
+      <div class="admin-manage-summary">
+        <span id="adminQuestionCount" class="muted" aria-live="polite">0問</span>
+        <button id="deleteCategoryBtn" class="danger" type="button" disabled>このカテゴリの問題をすべて削除</button>
+      </div>
+      <p id="adminManageMessage" class="muted" role="status"></p>
+      <div id="questionList" class="admin-question-list"></div>
+    </section>
+
+    <div class="row logout-row">
+      <button id="logoutBtn" class="ghost">ログアウト</button>
+    </div>
+  </section>
+  <p id="globalMessage" class="muted" role="status"></p>
+</main>
+</body>
+</html>
